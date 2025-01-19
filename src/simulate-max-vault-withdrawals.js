@@ -117,7 +117,7 @@ let currentDay = 0;
 // Store data points for visualization
 const dataPoints = [];
 
-for (let day = 0; day < 30; day++) {
+for (let day = 0; day < 180; day++) {
   currentDay = day;
   
   // Random chance of deposit or withdrawal
