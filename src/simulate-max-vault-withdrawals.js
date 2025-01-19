@@ -114,6 +114,9 @@ const metaVault = new MetaVault(1000000, 1000000); // 1M in each vault
 let currentDay = 0;
 
 // Simulate 30 days with random deposits and withdrawals
+// Store data points for visualization
+const dataPoints = [];
+
 for (let day = 0; day < 30; day++) {
   currentDay = day;
   
@@ -132,8 +135,40 @@ for (let day = 0; day < 30; day++) {
 
   const state = metaVault.processDay(currentDay);
   
+  // Store data point for this day
+  dataPoints.push({
+    day,
+    buffer: state.currentBuffer,
+    targetBuffer: state.targetBuffer,
+    vault1Balance: state.vault1Balance,
+    vault2Balance: state.vault2Balance,
+    vault1PendingTotal: state.vault1PendingWithdrawals.reduce((sum, w) => sum + w.amount, 0),
+    vault2PendingTotal: state.vault2PendingWithdrawals.reduce((sum, w) => sum + w.amount, 0)
+  });
+
+  // Print daily state
+  console.log('\n===========================================');
   console.log(`Buffer: ${state.currentBuffer.toFixed(2)} (Target: ${state.targetBuffer.toFixed(2)})`);
   console.log(`Vault 1 Balance: ${state.vault1Balance.toFixed(2)}`);
   console.log(`Vault 2 Balance: ${state.vault2Balance.toFixed(2)}`);
-  console.log('---');
+  console.log(`Vault 1 Pending Withdrawals: ${dataPoints[day].vault1PendingTotal.toFixed(2)}`);
+  console.log(`Vault 2 Pending Withdrawals: ${dataPoints[day].vault2PendingTotal.toFixed(2)}`);
+  console.log('===========================================\n');
 }
+
+// Visual representation of data
+console.log('\nSimulation Summary:');
+console.log('Day | Buffer % of Target | V1 Balance | V2 Balance | V1 Pending | V2 Pending');
+console.log('-'.repeat(75));
+
+dataPoints.forEach(dp => {
+  const bufferPercentage = ((dp.buffer / dp.targetBuffer) * 100).toFixed(1);
+  console.log(
+    `${dp.day.toString().padStart(2)} | ` +
+    `${bufferPercentage.padStart(6)}% | ` +
+    `${dp.vault1Balance.toFixed(0).padStart(9)} | ` +
+    `${dp.vault2Balance.toFixed(0).padStart(9)} | ` +
+    `${dp.vault1PendingTotal.toFixed(0).padStart(9)} | ` +
+    `${dp.vault2PendingTotal.toFixed(0).padStart(9)}`
+  );
+});
