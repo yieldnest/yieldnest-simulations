@@ -172,3 +172,92 @@ dataPoints.forEach(dp => {
     `${dp.vault2PendingTotal.toFixed(0).padStart(9)}`
   );
 });
+
+// Create chart using Chart.js
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+
+const width = 800;
+const height = 600;
+const chartCallback = (ChartJS) => {
+  ChartJS.defaults.responsive = true;
+  ChartJS.defaults.maintainAspectRatio = false;
+};
+
+const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, chartCallback });
+
+const configuration = {
+  type: 'line',
+  data: {
+    labels: dataPoints.map(dp => `Day ${dp.day}`),
+    datasets: [
+      {
+        label: 'Buffer',
+        data: dataPoints.map(dp => dp.buffer),
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1
+      },
+      {
+        label: 'Target Buffer',
+        data: dataPoints.map(dp => dp.targetBuffer),
+        borderColor: 'rgb(255, 99, 132)',
+        tension: 0.1
+      },
+      {
+        label: 'Vault 1 Balance',
+        data: dataPoints.map(dp => dp.vault1Balance),
+        borderColor: 'rgb(54, 162, 235)',
+        tension: 0.1
+      },
+      {
+        label: 'Vault 2 Balance', 
+        data: dataPoints.map(dp => dp.vault2Balance),
+        borderColor: 'rgb(153, 102, 255)',
+        tension: 0.1
+      },
+      {
+        label: 'Vault 1 Pending',
+        data: dataPoints.map(dp => dp.vault1PendingTotal),
+        borderColor: 'rgb(255, 159, 64)',
+        tension: 0.1
+      },
+      {
+        label: 'Vault 2 Pending',
+        data: dataPoints.map(dp => dp.vault2PendingTotal),
+        borderColor: 'rgb(255, 205, 86)',
+        tension: 0.1
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      title: {
+        display: true,
+        text: 'Meta Vault Simulation Results'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Amount'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Day'
+        }
+      }
+    }
+  }
+};
+
+(async () => {
+  const image = await chartJSNodeCanvas.renderToBuffer(configuration);
+  require('fs').writeFileSync('./vault-simulation-chart.png', image);
+  console.log('\nChart has been saved as vault-simulation-chart.png');
+})();
+
+
+
