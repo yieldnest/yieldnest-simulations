@@ -110,7 +110,7 @@ class MetaVault {
 }
 
 // Example usage
-const metaVault = new MetaVault(1000000, 1000000); // 1M in each vault
+const metaVault = new MetaVault(10000, 10000); // 10k in each vault
 let currentDay = 0;
 
 // Simulate 30 days with random deposits and withdrawals
@@ -123,12 +123,16 @@ for (let day = 0; day < 180; day++) {
   // Random chance of deposit or withdrawal
   const action = Math.random();
   if (action < 0.6) { // 60% chance of deposit
-    const depositAmount = Math.random() * 100000; // Random deposit up to 100k
+    const depositAmount = Math.random() * 1000; // Random deposit up to 1k
     metaVault.handleDeposit(depositAmount);
     console.log(`Day ${day}: Deposited ${depositAmount.toFixed(2)}`);
   } else { // 40% chance of withdrawal
     const maxWithdrawal = metaVault.buffer; // Can only withdraw what's in buffer
-    const withdrawalAmount = Math.random() * maxWithdrawal;
+    
+    // Use inverse exponential distribution to make larger withdrawals less likely
+    const randomFactor = Math.exp(-3 * Math.random()); // Exponential decay factor
+    const withdrawalAmount = randomFactor * maxWithdrawal;
+    
     const success = metaVault.handleWithdrawal(withdrawalAmount);
     console.log(`Day ${day}: Withdrawal ${success ? 'succeeded' : 'failed'} for ${withdrawalAmount.toFixed(2)}`);
   }
